@@ -82,12 +82,35 @@ box(2.2, 0.18, 0.7, 0, 0.6, 8, 0x168cff);
 // Simple skater placeholder
 box(0.7, 1.8, 0.7, 0, 1.6, 8, 0x202030);
 
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+// Skating movement
+const keys = {};
+
+window.addEventListener('keydown', (e) => {
+  keys[e.key.toLowerCase()] = true;
 });
 
+window.addEventListener('keyup', (e) => {
+  keys[e.key.toLowerCase()] = false;
+});
+
+const skater = scene.children[scene.children.length - 1];
+const board = scene.children[scene.children.length - 2];
+
+let speed = 0;
+
+function moveSkater() {
+  if (keys['w'] || keys['arrowup']) speed = Math.min(speed + 0.01, 0.25);
+  else if (keys['s'] || keys['arrowdown']) speed = Math.max(speed - 0.02, 0);
+  else speed *= 0.98;
+
+  if (keys['a'] || keys['arrowleft']) skater.position.x -= 0.08;
+  if (keys['d'] || keys['arrowright']) skater.position.x += 0.08;
+
+  skater.position.z -= speed;
+  board.position.x = skater.position.x;
+  board.position.z = skater.position.z - 0.9;
+}
+moveSkater();
 function animate() {
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
